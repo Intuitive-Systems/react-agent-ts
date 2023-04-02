@@ -16,7 +16,8 @@ import { configure, getLogger } from 'log4js';
 const retrievalApiUrl = config.retrieval_api_url;
 const retrievalApiKey = config.retrieval_api_key;
 const apiKey = config.openai_api_key;
-
+console.log(`Retrieval API URL: ${retrievalApiUrl}`);
+console.log(`Retrieval API Key: ${retrievalApiKey}`);
 // Tool Classes
 const serpAPITool = new SerpAPI(config.serp_api_key);
 const retrieveMemoryTool = new RetrieveMemory(retrievalApiUrl, retrievalApiKey);

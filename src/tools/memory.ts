@@ -35,9 +35,15 @@ export class RetrieveMemory extends BaseTool {
     //const formattedQueries = queries.map(query => ({ query, top_k }));
     const formattedQuery = {
       query: query,
-      top_k: top_k
+      top_k: top_k,
+      filter: {
+        source: "chat"
+      }
     }
-    const res = await axios.post<QueryResponse>(`${this.apiUrl}/query`, [formattedQuery], {
+    const payload = {
+      queries: [formattedQuery]
+    }
+    const res = await axios.post<QueryResponse>(`${this.apiUrl}/query`, payload, {
       headers: {
         Authorization: `Bearer ${this.bearerToken}`,
       },
@@ -77,36 +83,53 @@ export class SaveMemory extends BaseTool {
   private bearerToken: string;
 
   constructor(apiUrl: string, bearerToken: string) {
-    super("SaveMemory", "Save text and metadata to the vector database using the /upsert endpoint.");
+    super("SaveMemory", "This tool allows you to save user responses and other information for later retrieval.");
     this.apiUrl = apiUrl;
     this.bearerToken = bearerToken;
   }
 
-  async call(spaceDelimitedString: string): Promise<any> {
-    const [text, id, source, source_id, url, created_at, author] = spaceDelimitedString.split(' ');
+  async call(input: string): Promise<any> {
+    
 
     const document: UpsertDocument = {
-      text,
-      ...(id && { id }),
+      text: input,
       metadata: {
-        ...(source && { source }),
-        ...(source_id && { source_id }),
-        ...(url && { url }),
-        ...(created_at && { created_at }),
-        ...(author && { author }),
-      },
+        source: 'chat',
+      }
     };
-
-    const res = await axios.post<UpsertResponse>(`${this.apiUrl}/upsert`, [document], {
-      headers: {
-        Authorization: `Bearer ${this.bearerToken}`,
-      },
-    });
-
-    if (res.status !== 200) {
-      throw new Error(`Error saving document: ${res.statusText}`);
+    const payload = {
+      documents: [document]
     }
-
-    return res.data.document_ids[0];
+    console.log(`Saving document: ${JSON.stringify(document)}`)
+    if (!this.bearerToken) {
+      console.error('Bearer Token is not defined');
+    }
+    console.log(`Token: ${this.bearerToken}`);
+    
+    if (!this.apiUrl) {
+      console.error('API URL is not defined');
+    }
+    console.log(`API URL: ${this.apiUrl}`);
+    
+    console.log(`Payload: ${JSON.stringify(payload, null, 2)}`);
+    
+    try {
+      const res = await axios.post(`${this.apiUrl}/upsert`, payload, {
+        headers: {
+          Authorization: `Bearer ${this.bearerToken}`,
+          ContentType: 'application/json'
+        },
+      });
+    
+      if (res.status !== 200) {
+        throw new Error(`Error saving document: ${res.statusText}`);
+      }
+    
+      return "Document saved successfully!";
+    } catch (error) {
+      console.error(error);
+      console.error('Error during the request:', error.response.data);
+      throw error;
+    }
   }
 }
