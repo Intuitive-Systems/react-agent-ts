@@ -1,10 +1,20 @@
-# React-Agent-TS
+# 🚀 Welcome to React-Agent-TS 🤖
 
-A TypeScript implementation of the ReAct agent logic from the paper [Learning to Respond with Imagination](https://arxiv.org/abs/2210.03629).
+A TypeScript implementation of the ReAct agent logic from the paper 📄 [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629).
 
-React-Agent-TS allows you to build a powerful Chat Assistant that can interact with a user, make use of tools (e.g. search, memory retrieval) and have internal dialogues to generate meaningful responses.
+React-Agent-TS allows you to build a powerful 💪 Chat Assistant that can interact with users, make use of handy tools 🛠️ (e.g. search, memory retrieval), and have internal dialogues 🧠 to generate meaningful responses.
 
-## Setup
+## 🏗️ Architecture
+
+This amazing tool utilizes the Microsoft PromptEngine abstraction to model interactions. The Agent class models its thoughts as two parallel interactions: one with the user directly 👥, and another internal monologue with itself for problem-solving 🧩. This separation proves useful as it cuts down on complexity in the mental model when building higher-order systems.
+
+## 🔮 The Vision
+
+The vision for this project is to produce a completely local agent architecture that utilizes the growing library of bot plugins 🤖 in the [Wellknown.ai](https://www.wellknown.ai/) plugin repository. These agents, expert at a particular task, will be able to call into one another and perform complex behavior and automations 🔄 dynamically based on need.
+
+Using the principles of [factored cognition](https://primer.ought.org/), we can realize a future where not only do you own your data, but your personal bot 🤖 safely and carefully takes care of the minutiae so you can do more 🌟!
+
+## 🛠️ Setup
 
 Follow these steps to set up the project:
 
@@ -17,85 +27,41 @@ git clone https://github.com/Intuitive-Systems/react-agent-ts.git
 cd react-agent-ts
 ```
 
-3. Install dependencies:
+3. Set up .env files
+
+The agent relies on `.env.agent` and the local retrieval plugin relies on `.env.retrieval`. 
+Examples of each are in `.env.agent.example` and `.env.retrieval.example` respectively.  
+
+4. Compile and run:
 
 ```sh
-yarn install
+docker-compose up
 ```
 
-4. Create a `.env` file in the project root folder:
+## 📚 Usage
 
-```bash
-OPENAI_API_KEY=
-SERP_API_KEY=
+The agent is designed to be run as a service, via a graphql API. 
+
+Sending this query to `localhost:3000`:
+
 ```
-
-Fill in the required API keys, e.g.:
-
-```bash
-OPENAI_API_KEY=your_openai_api_key
-SERP_API_KEY=your_serp_api_key
-```
-
-5. Compile and run:
-
-```sh
-yarn build
-yarn start
-```
-
-## Usage
-
-### Import Agent Class
-
-```typescript
-import { Agent } from "react-agent-ts";
-```
-
-### Instantiate Agent
-
-```typescript
-const agent = new Agent();
-```
-
-### Add Message
-
-```typescript
-(async () => {
-  const userInput = "What is the weather like today?";
-  const response = await agent.addMessage(userInput);
-  console.log(response);
-})();
-```
-
-## Main Class
-
-The main class to use is `Agent`, which has the following properties and methods:
-
-```typescript
-class Agent {
-  private UserDialogue: ChatEngine;
-  reactEngine: ReactEngine;
-  constructor();
-  async addMessage(userInput: string): Promise<string | null>;
+query {
+  addMessage(userInput: "What is 5/4^13+4(3-1)?")
 }
 ```
 
-## Core Engine
+Will result in an answer being returned: 
+```
+{
+  "data": {
+    "addMessage": "The result of the expression 5/4^13+4(3-1) is approximately 8.000000074."
+  }
+}
+```
 
-`ReactEngine` is the core engine that implements the ReAct agent logic. It interacts with the `ChatEngine` and various tool classes like `SerpAPI`, `RetrieveMemory`, and `SaveMemory`.
-
-Complete `ReactEngine` code is available in the [project repository](https://github.com/Intuitive-Systems/react-agent-ts/blob/main/src/ReactEngine.ts).
-
-## Dependencies
-
-React-Agent-TS depends on the following libraries:
-
-- `fetch`: For making HTTP requests.
-- `log4js`: For logging.
-- `openai`: For interacting with OpenAI's API.
-- `prompt-engine`: For managing dialogue interactions.
-- `querystring`: For building query strings.
-- `typescript`: For working with TypeScript.
-
-Please refer to the [`package.json`](https://github.com/username/react-agent-ts/blob/main/package.json) for more information.
+## 📝 TODOs
+- [ ]: Set up tracing for debugging
+- [ ]: Re-assess Agent and ReactEngine abstraction to ensure fit
+- [ ]: fixup the ReactEngine system prompt such that tools are better formatted and have more information 
+- [ ]: flesh out the PluginTool such that it more dynamically deals with arbitrary plugins -- should probably be lifted into its own Engine / Agent abstraction (ex. PluginEnging or APIAgent)
+- [ ]: Build tracing tool which allows agent to introspect into traces and self-diagnose
