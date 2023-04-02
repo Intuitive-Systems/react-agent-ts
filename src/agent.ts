@@ -20,6 +20,15 @@ export class Agent {
             return null;
         }
     }
+    async reset() {
+        try {
+            this.reactEngine.reset();
+            return "History cleared";
+        } catch (error) {
+            console.error(`Error when clearing history: ${error}`);
+            return null;
+        }
+    }
 }
 
 export default Agent;

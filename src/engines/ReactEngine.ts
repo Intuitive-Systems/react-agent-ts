@@ -7,6 +7,8 @@ import {config} from '../config';
 import { ChatEngine, IChatConfig, DefaultChatConfig, Interaction } from 'prompt-engine';
 import { SerpAPI } from '../tools/serpApi';
 import { RetrieveMemory, SaveMemory } from '../tools/memory';
+import { GetWebpage } from '../tools/website';
+import { PluginTool } from '../tools/PluginTool';
 import { Tool } from '../interfaces';
 import { Step } from '../interfaces';
 import { configure, getLogger } from 'log4js';
@@ -22,6 +24,12 @@ console.log(`Retrieval API Key: ${retrievalApiKey}`);
 const serpAPITool = new SerpAPI(config.serp_api_key);
 const retrieveMemoryTool = new RetrieveMemory(retrievalApiUrl, retrievalApiKey);
 const saveMemoryTool = new SaveMemory(retrievalApiUrl, retrievalApiKey);
+const getWebpageTool = new GetWebpage();
+const calculatorTool = new PluginTool('Calculator', "This tool only supports one math operation at a time. You must up discrete operations into multiple actions based on their order of operations.")
+calculatorTool.load();
+
+
+console.log(calculatorTool.description);
 // logging setup
 configure({
     appenders: { out: { type: 'stdout' } },
@@ -37,7 +45,11 @@ export class ReactEngine {
     private InternalDialogue: ChatEngine; // represents the agent's internal dialogue with itself
     private steps: Step[] = []; // a list of steps that the agent has taken
     private systemPrompt: string = `You are the internal Monologue of a Chat Assistant. 
-You have access to the following tools to help you reply to a user:
+You run in a loop of Thought, Action, PAUSE, Observation.
+At the end of the loop you output an Answer
+Use Thought to describe your thoughts about the question you have been asked.
+Use Action to run one of the actions available to you - then return PAUSE.
+Observation will be the result of running those actions.
 
 Tools:
 {{tools}}
@@ -48,7 +60,9 @@ You should always reply with the following format:
 
 Rules:
 - If you have received an Input from the user, you should reply with a Thought and an Action.
-- If you have received an Observation from a tool, you should reply with a Thought and an Action.`
+- If you have received an Observation from a tool, you should reply with a Thought and an Action.
+- You should never reply with an Input.
+`
     private maxIterations = 8; // the maximum number of iterations that the agent can take
     constructor(
     )   {
@@ -93,6 +107,22 @@ Action: Search[weather today]`,
                         type: "assistant",
                     },
                 },
+                GetWebpage: {
+                    name: getWebpageTool.name,
+                    description: getWebpageTool.description,
+                    fn: (input: string) => getWebpageTool.call(input),
+                    input: {
+                        type: "assistant",
+                    },
+                },
+                Calculator: {
+                    name: calculatorTool.name,
+                    description: calculatorTool.description,
+                    fn: (input: string) => calculatorTool.call(input),
+                    input: {
+                        type: "assistant"
+                    }
+                },
                 RetrieveMemory: {
                     name: "RetrieveMemory",
                     description: retrieveMemoryTool.description,
@@ -128,7 +158,7 @@ Action: Search[weather today]`,
         // build the plan prompt 
         const planPrompt = this.InternalDialogue.buildPrompt(input);
         const planMessage: ChatMessage = {
-            role: "user",
+            role: "assistant",
             content: planPrompt,
         }
         logger.debug(`PLAN -- Plan Message: ${planMessage.content}`);
@@ -154,7 +184,7 @@ Action: Search[weather today]`,
         const observation = await tool.fn(actionInput);
         logger.debug(`ACT -- Observation: ${observation}`);
         // save the observation to the agent's memory
-        this.InternalDialogue.addInteraction(`${action}[${actionInput}]`, observation);
+        this.InternalDialogue.addInteraction(``, observation);
         return observation;
     }
 
@@ -182,6 +212,10 @@ Action: Search[weather today]`,
     public async call(input: string) {
         const response = await this.react(input);
         return response;
+    }
+
+    public reset(){
+        this.InternalDialogue.resetContext();
     }
 
     parseActionAndInput(text: string): [string, string] {

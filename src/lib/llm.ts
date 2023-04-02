@@ -117,7 +117,7 @@ export interface ChatMessage {
     content: string;
     name?: string;
 }
-export async function chatCompletion(messages: ChatMessage[], max_tokens: number = 1000, temperature: number = 0.7, model: string = "gpt-3.5-turbo") {
+export async function chatCompletion(messages: ChatMessage[], max_tokens: number = 1000, temperature: number = 0.7, model: string = "gpt-4") {
     const response = await retry(
         async () => {
             const result = await openai.createChatCompletion({

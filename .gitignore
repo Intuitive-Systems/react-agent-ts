@@ -30,6 +30,7 @@ yarn-error.log*
 .env.production.local
 **/.env 
 .env.retrieval
+.env.agent
 # turbo
 .turbo
 

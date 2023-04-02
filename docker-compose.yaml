@@ -1,6 +1,16 @@
 ---
 version: '3.4'
 services:
+  agent: 
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    env_file: 
+      - .env.agent
+    ports: 
+      - 3000:3000
+    volumes: 
+      - ./src:/usr/src/app/src
   retrieval:
     image: connerswann/chatgpt-retrieval-plugin:latest
     env_file: 
