@@ -99,7 +99,3 @@ React-Agent-TS depends on the following libraries:
 - `typescript`: For working with TypeScript.
 
 Please refer to the [`package.json`](https://github.com/username/react-agent-ts/blob/main/package.json) for more information.
-
-## License
-
-This project is licensed under the [MIT License](https://github.com/username/react-agent-ts/blob/main/LICENSE).
