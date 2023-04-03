@@ -63,6 +63,22 @@ Will result in an answer being returned:
 }
 ```
 
+## 🕵️‍♂️ Tracing
+
+React-Agent-TS library is instrumented with [OpenTelemetry](https://opentelemetry.io/), allowing agents to be easily traced and debugged during development. With OpenTelemetry, you can observe and monitor the application's performance, identify and diagnose any issues, and gain valuable insights into the inner workings of the agent.
+
+We have included a `docker-compose` setup that simplifies the process of launching and debugging the agent locally. This setup allows you to effortlessly collect, process, and export trace data to visualize and investigate the agent's behavior.
+
+To get started, make sure you have [Docker Compose](https://docs.docker.com/compose/install/) installed, and then simply use the following command to spin up the entire stack:
+
+```sh
+docker-compose up
+```
+
+After running the stack, you can navigate to the OpenTelemetry UI at [`http://localhost:16686`](http://localhost:16686) to view the collected data, inspect the trace spans, and analyze the performance metrics.
+
+By leveraging OpenTelemetry and our docker-compose setup, you can debug your ReAct agents both quickly and easily, ensuring a seamless development experience.
+
 ## 📝 TODOs
 - [ ]: Set up tracing for debugging
 - [ ]: Re-assess Agent and ReactEngine abstraction to ensure fit
