@@ -1,6 +1,5 @@
 import {Agent} from "./agent";
 
-
 (async () => {
     const agent = new Agent();
     const input = "What did I say about LLMs earlier?";

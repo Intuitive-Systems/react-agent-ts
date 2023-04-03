@@ -12,6 +12,7 @@ import { PluginTool } from '../tools/PluginTool';
 import { Tool } from '../interfaces';
 import { Step } from '../interfaces';
 import { configure, getLogger } from 'log4js';
+import { traceMethod } from '../lib/traceUtils';
 
 
 // Config Vars
@@ -146,6 +147,12 @@ Action: Search[weather today]`,
             const examples = this.examples.map((o) => `- ${o.input}\n${o.response}`).join("\n");
             this.systemPrompt = this.systemPrompt.replace("{{tools}}", tools).replace("{{examples}}", examples);
             this.InternalDialogue = new ChatEngine("", undefined, flowResetText, languageConfig);
+            const methodNames = Object.getOwnPropertyNames(ReactEngine.prototype);
+            for (const methodName of methodNames) {
+                if (methodName !== 'constructor') {
+                    traceMethod(this, methodName);
+                }
+            }
         };
    
     private async plan(input: string) {

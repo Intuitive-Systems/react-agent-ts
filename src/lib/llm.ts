@@ -2,7 +2,10 @@ const retry = require('async-retry');
 import {Configuration, OpenAIApi} from 'openai';
 import {config} from "../config";
 import { inspect } from 'util';
-
+import opentelemetry from "@opentelemetry/api";
+const tracer = opentelemetry.trace.getTracer(
+    'react-agent-ts'
+  );
 const configuration = new Configuration({
     apiKey: config.openai_api_key
 });
@@ -26,6 +29,7 @@ const openai = new OpenAIApi(configuration);
     @return string - The edited text
 */
 export async function openaiEdit(input: string, instruction: string, n: number = 1, temperature: number = 1, top_p: number = 1, model: string = "text-davinci-edit-001") {
+    const span = tracer.startSpan('openaiEdit');
     const response = await retry(
         async () => {
             const result = await openai.createEdit({
@@ -58,6 +62,7 @@ export async function openaiEdit(input: string, instruction: string, n: number =
     );
 
     const text = response.data.choices[0].text;
+    span.end();
     return text!;
 }
 
@@ -76,6 +81,7 @@ export async function openaiEdit(input: string, instruction: string, n: number =
     @return string - The generated text
 */
 export async function openaiCompletion(prompt: string, nTokens: number = 500, temperature: number = 1, model: string = "text-davinci-003"): Promise<string> {
+    const span = tracer.startSpan('openaiCompletion');
     const response = await retry(
         async () => {
             const result = await openai.createCompletion({
@@ -109,6 +115,7 @@ export async function openaiCompletion(prompt: string, nTokens: number = 500, te
     );
 
     const text = response.data.choices[0].text;
+    span.end();
     return text!;
 }
 
@@ -118,6 +125,7 @@ export interface ChatMessage {
     name?: string;
 }
 export async function chatCompletion(messages: ChatMessage[], max_tokens: number = 1000, temperature: number = 0.7, model: string = "gpt-4") {
+    const span = tracer.startSpan('chatCompletion');
     const response = await retry(
         async () => {
             const result = await openai.createChatCompletion({
@@ -150,5 +158,6 @@ export async function chatCompletion(messages: ChatMessage[], max_tokens: number
     );
 
     const text = response.data.choices[0].message.content;
+    span.end();
     return text!;
 }
