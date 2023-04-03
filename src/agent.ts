@@ -1,5 +1,6 @@
 import { ChatEngine } from "prompt-engine";
 import { ReactEngine } from "./engines/ReactEngine";
+import { traceMethod } from './lib/traceUtils';
 
 export class Agent {
     private UserDialogue: ChatEngine; // represents the agent's direct conversation with the user
@@ -7,6 +8,12 @@ export class Agent {
     constructor() {
         this.reactEngine = new ReactEngine();
         this.UserDialogue = new ChatEngine();
+        const methodNames = Object.getOwnPropertyNames(Agent.prototype);
+            for (const methodName of methodNames) {
+                if (methodName !== 'constructor') {
+                    traceMethod(this, methodName);
+                }
+        }
     }
 
     async addMessage(userInput: string) {

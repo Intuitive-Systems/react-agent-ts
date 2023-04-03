@@ -8,6 +8,10 @@ React-Agent-TS allows you to build a powerful 💪 Chat Assistant that can inter
 
 This amazing tool utilizes the Microsoft PromptEngine abstraction to model interactions. The Agent class models its thoughts as two parallel interactions: one with the user directly 👥, and another internal monologue with itself for problem-solving 🧩. This separation proves useful as it cuts down on complexity in the mental model when building higher-order systems.
 
+### Here's an example of the React Agent thought process: 
+
+![Swimlanes Diagram](https://static.swimlanes.io/2c45225fcfec45210b2398d3ec8c0fad.png)
+
 ## 🔮 The Vision
 
 The vision for this project is to produce a completely local agent architecture that utilizes the growing library of bot plugins 🤖 in the [Wellknown.ai](https://www.wellknown.ai/) plugin repository. These agents, expert at a particular task, will be able to call into one another and perform complex behavior and automations 🔄 dynamically based on need.
@@ -59,9 +63,31 @@ Will result in an answer being returned:
 }
 ```
 
+## 🕵️‍♂️ Tracing
+
+React-Agent-TS library is instrumented with [OpenTelemetry](https://opentelemetry.io/), allowing agents to be easily traced and debugged during development. With OpenTelemetry, you can observe and monitor the application's performance, identify and diagnose any issues, and gain valuable insights into the inner workings of the agent.
+
+We have included a `docker-compose` setup that simplifies the process of launching and debugging the agent locally. This setup allows you to effortlessly collect, process, and export trace data to visualize and investigate the agent's behavior.
+
+To get started, make sure you have [Docker Compose](https://docs.docker.com/compose/install/) installed, and then simply use the following command to spin up the entire stack:
+
+```sh
+docker-compose up
+```
+
+After running the stack, you can navigate to the OpenTelemetry UI at [`http://localhost:16686`](http://localhost:16686) to view the collected data, inspect the trace spans, and analyze the performance metrics.
+
+By leveraging OpenTelemetry and our docker-compose setup, you can debug your ReAct agents both quickly and easily, ensuring a seamless development experience.
+
 ## 📝 TODOs
 - [ ]: Set up tracing for debugging
 - [ ]: Re-assess Agent and ReactEngine abstraction to ensure fit
 - [ ]: fixup the ReactEngine system prompt such that tools are better formatted and have more information 
 - [ ]: flesh out the PluginTool such that it more dynamically deals with arbitrary plugins -- should probably be lifted into its own Engine / Agent abstraction (ex. PluginEnging or APIAgent)
 - [ ]: Build tracing tool which allows agent to introspect into traces and self-diagnose
+
+## About the Author 🧑‍💻
+
+react-agent-ts was created by Conner Swann, founder of Intuitive Systems. Conner is a passionate developer and advocate for democratizing AI models and frameworks, believing that access to powerful machine learning tookits should be available to everyone 🌍. In the words of the modern sage, "When the AI tide rises, all boats should float" 🚣.
+
+You can find Conner on Twitter, sharing insights and occasional shenanigans 🎭 at [@YourBuddyConner](https://twitter.com/YourBuddyConner). While he definitely enjoys being on the bandwagon for advancing AI 🤖, he remains humbly committed to exploring and delivering state-of-the-art technology for everyone's benefit.
