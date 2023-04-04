@@ -9,11 +9,12 @@ import { SerpAPI } from '../tools/serpApi';
 import { RetrieveMemory, SaveMemory } from '../tools/memory';
 import { GetWebpage } from '../tools/website';
 import { PluginTool } from '../tools/PluginTool';
-import { Tool } from '../interfaces';
+import { Component, Tool } from '../interfaces';
 import { Step } from '../interfaces';
 import { configure, getLogger } from 'log4js';
+import { traceMethod } from '../lib/traceUtils';
+import { CardComponent } from '../ui/components/Card';
 import { BaseEngine } from './base';
-
 
 // Config Vars
 const retrievalApiUrl = config.retrieval_api_url;
@@ -29,6 +30,8 @@ const getWebpageTool = new GetWebpage();
 const calculatorTool = new PluginTool('Calculator', "This tool only supports one math operation at a time. You must up discrete operations into multiple actions based on their order of operations.")
 calculatorTool.load();
 
+// Component Classes 
+const cardComponent = new CardComponent();
 
 console.log(calculatorTool.description);
 // logging setup
@@ -38,34 +41,56 @@ configure({
         default: { appenders: ['out'], level: 'debug' }, // Set log level to 'info'
     },
 });
-const logger = getLogger('ReactEngine');
+const logger = getLogger('ComponentEngine');
 
-export class ReactEngine extends BaseEngine {
+export class ComponentEngine extends BaseEngine {
     private actionMap: Record<string, Tool>; // a map of tools that the agent can use
+    private responseComponents: Record<string, Component>; // a map of components that the agent can use to respond to the user
     private examples: Interaction[]; // a list of examples that the agent can use
     private InternalDialogue: ChatEngine; // represents the agent's internal dialogue with itself
     private steps: Step[] = []; // a list of steps that the agent has taken
     private systemPrompt: string = `You are the internal Monologue of a Chat Assistant. 
-You run in a loop of Thought, Action, PAUSE, Observation.
-At the end of the loop you output an Answer
-Use Thought to describe your thoughts about the question you have been asked.
-Use Action to run one of the actions available to you - then return PAUSE.
-Observation will be the result of running those actions.
-
-Tools:
-{{tools}}
-
-You should always reply with the following format:
-
-{{examples}}
-
-Rules:
-- If you have received an Input from the user, you should reply with a Thought and an Action.
-- If you have received an Observation from a tool, you should reply with a Thought and an Action.
-- You should never reply with an Input.
+    You run in a loop of Thought, Action, Observation.
+    At the end of the loop you output an Answer
+    Use Thought to describe your thoughts about the question you have been asked.
+    Use Action to run one of the actions available to you.
+    Observation will be the result of running those actions.
+     
+    You can use tools to collect the required information for responsing to the user. 
+    
+    Tools:
+    {{tools}} 
+    
+    You have access to these components with which to respond:  
+    
+    Components: 
+    {{components}} 
+    
+    Your internal monologue always takes the following format:
+    
+    """
+    Input: What the user needs or wants
+    Thought: you should always think about what to do
+    Action: the action to take, should be one of [{{toolNames}}]
+    Observation: the result of the action
+    ... (this Thought/Action/Observation can repeat N times)
+    Thought: I can now reply to the user 
+    Action: Finish[reply to the user]
+    Component: Component[Component Parameters]
+    """
+    
+    Example:
+    {{examples}}
+    
+    Rules:
+    - If you have received an Input from the user, you should reply with a Thought and an Action.
+    - If you have received an Observation from a tool, you should reply with a Thought and an Action.
+    - If you are ready to respond to the user, you should reply with a Finish action and a Component
+    - You should never reply with an Input. 
+    - You should never use a Component in an Action or Observation.  
 `
     private maxIterations = 8; // the maximum number of iterations that the agent can take
-    constructor() {
+    constructor(){
         super();
         this.examples = [
             {
@@ -92,60 +117,49 @@ Action: Finish[Barack Obama is 60 years old]`
             Finish: {
                 name: "Finish",
                 description:
-                    "Return a response to the user. This should be the last action you take. Finish[Your reply]",
+                    "Return a response to the user. You should also include a component with this action on the next line. Finish[Your reply]",
                 fn: (input: string) => {
                     return input;
                 },
                 input: {
                     type: "assistant",
                 },
-            },
+            }, 
             Search: {
                 name: "Search",
-                description: serpAPITool.description,
-                fn: (input: string) => serpAPITool.call(input),
+                description:
+                    "Search the web for information. Search[Your search query]",
+                fn: (input: string) => {
+                    return serpAPITool.call(input);
+                },
                 input: {
                     type: "assistant",
-                },
-            },
-            GetWebpage: {
-                name: getWebpageTool.name,
-                description: getWebpageTool.description,
-                fn: (input: string) => getWebpageTool.call(input),
-                input: {
-                    type: "assistant",
-                },
-            },
-            Calculator: {
-                name: calculatorTool.name,
-                description: calculatorTool.description,
-                fn: (input: string) => calculatorTool.call(input),
-                input: {
-                    type: "assistant"
                 }
-            },
-            RetrieveMemory: {
-                name: "RetrieveMemory",
-                description: retrieveMemoryTool.description,
-                fn: (input: string) => retrieveMemoryTool.call(input),
+            }
+        }
+        this.responseComponents = {
+            Card: {
+                name: cardComponent.name,
+                description: cardComponent.description,
+                fn: (input: string) => {
+                    return cardComponent.call(input);
+                },
                 input: {
                     type: "assistant",
-                },
-            },
-            SaveMemory: {
-                name: "SaveMemory",
-                description: saveMemoryTool.description,
-                fn: (input: string) => saveMemoryTool.call(input),
-                input: {
-                    type: "assistant",
-                },
+                }
             }
         }
         const tools = Object.values(this.actionMap)
             .map((o) => `- ${o.name}[${o.description}]`)
             .join("\n");
+        const components = Object.values(this.responseComponents)
+            .map((o) => `- ${o.name}[${o.description}]`)
+            .join("\n");
         const examples = this.examples.map((o) => `- ${o.input}\n${o.response}`).join("\n");
-        this.systemPrompt = this.systemPrompt.replace("{{tools}}", tools).replace("{{examples}}", examples);
+        this.systemPrompt = this.systemPrompt
+            .replace("{{tools}}", tools)
+            .replace("{{examples}}", examples)
+            .replace("{{components", components)
         this.InternalDialogue = new ChatEngine("", undefined, flowResetText, languageConfig);
     };
    
@@ -172,8 +186,14 @@ Action: Finish[Barack Obama is 60 years old]`
         this.InternalDialogue.addInteraction(`${input}`, plan);
         // parse the plan
         const [action, actionInput] = this.parseActionAndInput(plan);
+        if (action === "Finish") {
+            // if the action is Finish, we need to parse the component
+            const [component, componentInput] = this.parseComponentAndInput(plan);
+            // return both action and component and their inputs
+            return [action, actionInput, component, componentInput];
+        }
         logger.debug(`PLAN -- Parsed Action: ${action}, Parsed Action Input: ${actionInput}`);
-        return [action, actionInput];
+        return [action, actionInput, undefined, undefined];
     }
 
     private async act(action: string, actionInput: string) {
@@ -189,22 +209,44 @@ Action: Finish[Barack Obama is 60 years old]`
         return observation;
     }
 
-    private async react(input: string): Promise<string> {
+    private async component(component: string, componentInput: string) {
+        const responseComponent = this.responseComponents[component];
+        if (!responseComponent) {
+            throw new Error(`Could not find component: ${component}`);
+        }
+        logger.debug(`COMPONENT -- Acting with component: ${responseComponent.name} and input: ${componentInput}`)
+        const response = await responseComponent.fn(componentInput);
+        logger.debug(`COMPONENT -- Response: ${response}`);
+        return response;
+    }
+
+    private async react(input: string): Promise<Record<string, any>> {
         logger.debug(`Reacting to input: ${input}`)
-        let [action, actionInput] = await this.plan(`Input: ${input}`);
+        let [action, actionInput, component, componentInput] = await this.plan(`Input: ${input}`);
         logger.debug(`React -- Planned Action: ${action}, Action Input: ${actionInput}`)
         if (action === "Finish") {
-            return actionInput;
+            logger.debug(`React -- Planned Component: ${component}, Component Input: ${componentInput}`)
+            const response = await this.component(component, componentInput);
+            logger.debug(`React -- Component Response: ${response}`)
+            return {
+                message: actionInput,
+                component: response,
+            }
         }
+
         for (let i = 0; i < this.maxIterations; i++) {
             logger.debug(`React -- Iteration: ${i}`)
             const observation = await this.act(action, actionInput);
             logger.debug(`React -- Observation: ${observation}`);
-            [action, actionInput] = await this.plan(`Observation: ${observation}`);
+            [action, actionInput, component, componentInput] = await this.plan(`Observation: ${observation}`);
             logger.debug(`React -- Planned Action: ${action}, Action Input: ${actionInput}`)
             if (action === "Finish") {
-                logger.debug(`React -- Finished with response: ${actionInput}`)
-                return actionInput;
+                const response = await this.component(component, componentInput);
+                logger.debug(`React -- Component Response: ${response}`)
+                return {
+                    message: actionInput,
+                    component: response,
+                }
             }
         }   
         throw new Error(`Max iterations reached: ${this.maxIterations}`);
@@ -212,7 +254,7 @@ Action: Finish[Barack Obama is 60 years old]`
 
     public async call(input: string) {
         const response = await this.react(input);
-        return response;
+        return JSON.stringify(response);
     }
 
     public reset(){
@@ -232,7 +274,28 @@ Action: Finish[Barack Obama is 60 years old]`
     
         const match = text.match(regex);
         if (!match) {
-          throw new Error(`Could not parse text: ${text}`);
+          throw new Error(`Could not parse action text: ${text}`);
+        }
+    
+        const action = match[1].trim();
+        const input = match[2].trim().replace(/^"(.*)"$/, "$1");
+    
+        return [action, input];
+    }
+    parseComponentAndInput(text: string): [string, string] {
+        // todo: this is a hack, we should use a proper parser
+        const regex = `Component: (${Object.keys(this.responseComponents)
+          .reduce((acc, a, i) => {
+            if (i === 0) {
+              return acc + a;
+            }
+            return acc + "|" + a;
+          })
+          .trim()})\\[(.*)\\]\\n?`;
+    
+        const match = text.match(regex);
+        if (!match) {
+          throw new Error(`Could not parse component text: ${text}`);
         }
     
         const action = match[1].trim();

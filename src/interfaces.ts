@@ -29,3 +29,12 @@ export interface Tool {
     };
     returnDirect?: boolean;
 }
+
+export interface Component {
+    name: string;
+    description: string;
+    fn: (input: string) => Promise<Record<string, string>>;
+    input: {
+      type: "user" | "assistant" | "both"; // who is providing the input
+    };
+}
