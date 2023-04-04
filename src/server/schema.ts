@@ -1,28 +1,47 @@
 import { GraphQLSchema, GraphQLString, GraphQLObjectType, GraphQLInt } from 'graphql';
-import Agent from '../agent';
-
-const agentInstance = new Agent();
+import {ReactAgent} from '../agents/ReactAgent';
+import {ComponentAgent} from '../agents/ComponentAgent';
+const reactAgent = new ReactAgent();
+const componentAgent = new ComponentAgent();
 
 export const schema = new GraphQLSchema({
     query: new GraphQLObjectType({
         name: 'Query',
         fields: {
             // ... other fields (edit and completion) ...
-            addMessage: {
+            reactMessage: {
                 type: GraphQLString,
                 args: {
                     userInput: { type: GraphQLString },
                 },
                 resolve: async (parent: any, args: any) => {
                     const userInput = args.userInput;
-                    const response = await agentInstance.addMessage(userInput);
+                    const response = await reactAgent.addMessage(userInput);
                     return response;
                 }
             },
-            reset: {
+            resetReact: {
                 type: GraphQLString,
                 resolve: async (parent: any, args: any) => {
-                    const response = await agentInstance.reset();
+                    const response = await reactAgent.reset();
+                    return "ok";
+                }
+            },
+            componentMessage: {
+                type: GraphQLString,
+                args: {
+                    userInput: { type: GraphQLString },
+                },
+                resolve: async (parent: any, args: any) => {
+                    const userInput = args.userInput;
+                    const response = await componentAgent.addMessage(userInput);
+                    return response;
+                }
+            },
+            resetComponent: {
+                type: GraphQLString,
+                resolve: async (parent: any, args: any) => {
+                    const response = await componentAgent.reset();
                     return "ok";
                 }
             }

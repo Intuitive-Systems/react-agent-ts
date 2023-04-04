@@ -1,14 +1,14 @@
 import { ChatEngine } from "prompt-engine";
-import { ReactEngine } from "./engines/ReactEngine";
-import { traceMethod } from './lib/traceUtils';
+import { IBaseEngine } from "../engines/base";
+import { traceMethod } from '../lib/traceUtils';
 
-export class Agent {
+export class BaseAgent<T extends IBaseEngine> {
     private UserDialogue: ChatEngine; // represents the agent's direct conversation with the user
-    reactEngine: ReactEngine;
-    constructor() {
-        this.reactEngine = new ReactEngine();
+    engine: T;
+    constructor(engine: T) {
+        this.engine = engine;
         this.UserDialogue = new ChatEngine();
-        const methodNames = Object.getOwnPropertyNames(Agent.prototype);
+        const methodNames = Object.getOwnPropertyNames(BaseAgent.prototype);
             for (const methodName of methodNames) {
                 if (methodName !== 'constructor') {
                     traceMethod(this, methodName);
@@ -18,7 +18,7 @@ export class Agent {
 
     async addMessage(userInput: string) {
         try {
-            const response = await this.reactEngine.call(userInput);
+            const response = await this.engine.call(userInput);
             // save the user's input to the agent's memory
             this.UserDialogue.addInteraction(userInput, response);
             return response;
@@ -29,7 +29,7 @@ export class Agent {
     }
     async reset() {
         try {
-            this.reactEngine.reset();
+            this.engine.reset();
             return "History cleared";
         } catch (error) {
             console.error(`Error when clearing history: ${error}`);
@@ -37,5 +37,3 @@ export class Agent {
         }
     }
 }
-
-export default Agent;
