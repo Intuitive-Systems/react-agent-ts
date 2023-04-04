@@ -19,6 +19,5 @@ export abstract class BaseEngine {
     }
 
     public abstract call(input: string): Promise<string>;
-    protected abstract parseActionAndInput(text: string): [string, string];
     public abstract reset(): void; 
 }
