@@ -18,6 +18,35 @@ The vision for this project is to produce a completely local agent architecture 
 
 Using the principles of [factored cognition](https://primer.ought.org/), we can realize a future where not only do you own your data, but your personal bot 🤖 safely and carefully takes care of the minutiae so you can do more 🌟!
 
+### 🛣️ The Roadmap
+Here's a rough outline of the journey ahead. We'd love to hear your thoughts and ideas, and we invite you to contribute to the project in any way you're comfortable!
+
+1. **API Wrapper Fiesta! 🎉**: We'll begin by developing our own API wrapper, which will serve as a bridge between GPT4ALL and chatbot UIs built for the OpenAI ChatCompletions API.
+
+2. **The Local Chatbot Revolution 🌐**: Empower users to create local chatbots with little-to-no setup. Got ideas for simplifying the process? We're all ears 👂!
+
+3. **Have Plugin, Will Expand 🔌**: Let's build a rich ecosystem of plugins to extend the functionality of the local chatbot. Got a great idea? Share it, build it, or join forces with like-minded developers to make it happen!
+
+4. **UI: A Portal to the AI Realm 🖥️**: Together, we'll create or fork an elegant, user-friendly UI that can be customized and shipped with model binaries.
+
+5. **Feedback: The Spice of AI Life 🌶️**: Gather and use user feedback to continuously iterate on the UI and app features, turning our AI assistant into a masterpiece.
+
+6. **The World Is Our Playground 🌍**: Envision and identify new platforms (mobile, web apps, browser plugins, etc.) to bring our creation to more users.
+
+7. **Docs & Tutorials: Knowledge Unleashed 📚**: Develop comprehensive documentation and tutorials to guide users and developers on their path to AI mastery.
+
+8. **Building Together: The Dev Community 🏗️**: Establish a thriving developer community—host events, workshops, contests and collaborate on open-source projects.
+
+9. **Tap into the Matrix: Data & Services Integration 🔗**: Let's help our AI interact with external data sources and services, enabling powerful automations and enhanced capabilities.
+
+10. **Next Level Automations: Rise of the Machines 🤖**: Continuously innovate to unveil sophisticated features and automations, turning our AI assistant into a personal powerhouse.
+
+11. **Fort Knox: Secure the AI Sanctuary 🔒**: Create a robust security model to protect user data by adding end-to-end encryption and maintaining data sovereignty.
+
+12. **Zoom, Zoom: SuperchargeAI 🏎️**: Regularly optimize our AI system's performance to keep it running smoothly and efficiently.
+
+13. **Expand the Horizons: Sky's the Limit 🌌**: Continue building out new features and push the boundaries of our AI assistant, inching ever closer to our grand vision.
+
 ## 🛠️ Setup
 
 Follow these steps to set up the project:
