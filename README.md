@@ -47,6 +47,9 @@ Here's a rough outline of the journey ahead. We'd love to hear your thoughts and
 
 13. **Expand the Horizons: Sky's the Limit 🌌**: Continue building out new features and push the boundaries of our AI assistant, inching ever closer to our grand vision.
 
+### 🎙️ Speak Up, Join In!
+Join us on the [Github Discussions Board](https://github.com/Intuitive-Systems/react-agent-ts/discussions) and let us know what you want to see! 
+
 ## 🛠️ Setup
 
 Follow these steps to set up the project:
