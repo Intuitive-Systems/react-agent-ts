@@ -50,7 +50,7 @@ Sending this query to `localhost:3000`:
 
 ```
 query {
-  addMessage(userInput: "What is 5/4^13+4(3-1)?")
+  reactMessage(userInput: "When was Michael Jackson born?")
 }
 ```
 
