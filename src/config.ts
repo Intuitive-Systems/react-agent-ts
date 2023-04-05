@@ -18,7 +18,7 @@ export const config: {
     serp_api_key: process.env.SERP_API_KEY ?? '',
     retrieval_api_key: process.env.RETRIEVAL_API_KEY ?? '',
     retrieval_api_url: process.env.RETRIEVAL_API_URL ?? '',
-    server_port: parseInt(process.env.SERVER_PORT ?? '8000'),
+    server_port: parseInt(process.env.SERVER_PORT ?? '3000'),
 }
 
 if (config.environment === 'development') {
