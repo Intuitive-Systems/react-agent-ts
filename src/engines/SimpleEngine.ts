@@ -10,10 +10,9 @@ import { RetrieveMemory, SaveMemory } from '../tools/memory';
 import { GetWebpage } from '../tools/website';
 import { PluginTool } from '../tools/PluginTool';
 import { Tool } from '../interfaces';
-import { Step } from '../interfaces';
 import { configure, getLogger } from 'log4js';
 import { BaseEngine } from './base';
-
+import { examples } from './examples';
 
 // Config Vars
 const retrievalApiUrl = config.retrieval_api_url;
@@ -40,11 +39,10 @@ configure({
 });
 const logger = getLogger('ReactEngine');
 
-export class ReactEngine extends BaseEngine {
+export class SimpleEngine extends BaseEngine {
     private actionMap: Record<string, Tool>; // a map of tools that the agent can use
     private examples: Interaction[]; // a list of examples that the agent can use
     private InternalDialogue: ChatEngine; // represents the agent's internal dialogue with itself
-    private steps: Step[] = []; // a list of steps that the agent has taken
     private systemPrompt: string = `You are the internal Monologue of a Chat Assistant. 
 You run in a loop of Thought, Action, PAUSE, Observation.
 At the end of the loop you output an Answer
@@ -67,21 +65,7 @@ Rules:
     private maxIterations = 8; // the maximum number of iterations that the agent can take
     constructor() {
         super();
-        this.examples = [
-            {
-                "input": "Input: What is the weather like today?",
-                "response": `Thought: I should search for the weather 
-Action: Search[weather today]`,
-            },
-            {
-                "input": "Input: How old is Barack Obama?",
-                "response": `Thought: I need to find Barack Obama's age
-Action: Search[Barack Obama age]
-Observation: Barack Obama is 60 years old
-Thought: I can provide the user with the information
-Action: Finish[Barack Obama is 60 years old]`
-            }
-        ]
+        this.examples = examples;
         const flowResetText = "";
         const languageConfig: Partial<IChatConfig> = {
             modelConfig: {
@@ -144,8 +128,8 @@ Action: Finish[Barack Obama is 60 years old]`
         const tools = Object.values(this.actionMap)
             .map((o) => `- ${o.name}[${o.description}]`)
             .join("\n");
-        const examples = this.examples.map((o) => `- ${o.input}\n${o.response}`).join("\n");
-        this.systemPrompt = this.systemPrompt.replace("{{tools}}", tools).replace("{{examples}}", examples);
+        const examplePrompt = this.examples.map((o) => `- ${o.input}\n${o.response}`).join("\n");
+        this.systemPrompt = this.systemPrompt.replace("{{tools}}", tools).replace("{{examples}}", examplePrompt);
         this.InternalDialogue = new ChatEngine("", undefined, flowResetText, languageConfig);
     };
    
