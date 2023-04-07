@@ -1,0 +1,54 @@
+{
+    "goal": "Write a blog post about {{topic}}, the target audience is {{audience}}",
+    "inputs": [
+        {
+            "name": "topic",
+            "type": "string",
+            "description": "The topic of the blog post",
+            "example": "How to write a blog post"
+        },
+        {
+            "name": "audience",
+            "type": "string",
+            "description": "The target audience of the blog post",
+            "example": "beginners"
+        }
+    ],
+    "tasks": [
+        {
+            "name": "Outline",
+            "spec": "- Outline the blog post\n- Outline the headings of the blog post\n- Outline the subheadings of the blog post",
+            "tools": [],
+            "input_type": null,
+            "output_type": "string"
+        },
+        {
+            "name": "Research",
+            "spec": "- A blog post outline is a list of headings and subheadings\n- In order to write a blog post, you need to research the headings and subheadings and take notes on them\n- You can research the headings and subheadings by searching for them on the internet\n- Notes are collected based on how closely they adhere to the goal of the blog post",
+            "tools": ["Search", "GetWebpage"],
+            "input_type": null,
+            "output_type": "string"
+        },
+        {
+            "name": "Write",
+            "spec": "- Write the blog post using the outline as a guide\n- Write the blog post in a way that is easy to read\n- Write the blog post in a way that is easy to understand",
+            "tools": [],
+            "input_type": "string",
+            "output_type": "string"
+        },
+        {
+            "name": "Edit",
+            "spec": "- Edit the blog post to make it easy to read\n- Edit the blog post to make it easy to understand\n- Edit the blog post to make it easy to follow",
+            "tools": [],
+            "input_type": "string",
+            "output_type": "string"
+        },
+        {
+            "name": "Finish",
+            "spec": "- Return the full blog post to the user",
+            "tools": ["Finish"],
+            "input_type": null,
+            "output_type": "string"
+        }
+    ]
+}
