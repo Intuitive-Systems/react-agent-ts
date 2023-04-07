@@ -1,8 +1,6 @@
 import { GraphQLSchema, GraphQLString, GraphQLObjectType, GraphQLInt } from 'graphql';
-import {ReactAgent} from '../agents/ReactAgent';
-import {ComponentAgent} from '../agents/ComponentAgent';
-const reactAgent = new ReactAgent();
-const componentAgent = new ComponentAgent();
+import {SimpleAgent} from '../agents/SimpleAgent';
+const simpleAgent = new SimpleAgent();
 
 export const schema = new GraphQLSchema({
     query: new GraphQLObjectType({
@@ -16,32 +14,14 @@ export const schema = new GraphQLSchema({
                 },
                 resolve: async (parent: any, args: any) => {
                     const userInput = args.userInput;
-                    const response = await reactAgent.addMessage(userInput);
+                    const response = await simpleAgent.addMessage(userInput);
                     return response;
                 }
             },
             resetReact: {
                 type: GraphQLString,
                 resolve: async (parent: any, args: any) => {
-                    const response = await reactAgent.reset();
-                    return "ok";
-                }
-            },
-            componentMessage: {
-                type: GraphQLString,
-                args: {
-                    userInput: { type: GraphQLString },
-                },
-                resolve: async (parent: any, args: any) => {
-                    const userInput = args.userInput;
-                    const response = await componentAgent.addMessage(userInput);
-                    return response;
-                }
-            },
-            resetComponent: {
-                type: GraphQLString,
-                resolve: async (parent: any, args: any) => {
-                    const response = await componentAgent.reset();
+                    const response = await simpleAgent.reset();
                     return "ok";
                 }
             }
