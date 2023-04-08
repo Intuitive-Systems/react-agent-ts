@@ -5,31 +5,11 @@
 import { ChatMessage, chatCompletion } from '../lib/llm';
 import {config} from '../config';
 import { ChatEngine, IChatConfig, DefaultChatConfig, Interaction } from 'prompt-engine';
-import { SerpAPI } from '../tools/serpApi';
-import { RetrieveMemory, SaveMemory } from '../tools/memory';
-import { GetWebpage } from '../tools/website';
-import { PluginTool } from '../tools/PluginTool';
+
 import { Tool } from '../interfaces';
 import { configure, getLogger } from 'log4js';
 import { BaseEngine } from './base';
-import { examples } from './examples';
 
-// Config Vars
-const retrievalApiUrl = config.retrieval_api_url;
-const retrievalApiKey = config.retrieval_api_key;
-const apiKey = config.openai_api_key;
-console.log(`Retrieval API URL: ${retrievalApiUrl}`);
-console.log(`Retrieval API Key: ${retrievalApiKey}`);
-// Tool Classes
-const serpAPITool = new SerpAPI(config.serp_api_key);
-const retrieveMemoryTool = new RetrieveMemory(retrievalApiUrl, retrievalApiKey);
-const saveMemoryTool = new SaveMemory(retrievalApiUrl, retrievalApiKey);
-const getWebpageTool = new GetWebpage();
-const calculatorTool = new PluginTool('Calculator', "This tool only supports one math operation at a time. You must up discrete operations into multiple actions based on their order of operations.")
-calculatorTool.load();
-
-
-console.log(calculatorTool.description);
 // logging setup
 configure({
     appenders: { out: { type: 'stdout' } },
@@ -63,7 +43,7 @@ Rules:
 - You should never reply with an Input.
 `
     private maxIterations = 8; // the maximum number of iterations that the agent can take
-    constructor() {
+    constructor(tools: Record<string, Tool>, examples: Interaction[]) {
         super();
         this.examples = examples;
         const flowResetText = "";
@@ -84,52 +64,13 @@ Rules:
                     type: "assistant",
                 },
             },
-            Search: {
-                name: "Search",
-                description: serpAPITool.description,
-                fn: (input: string) => serpAPITool.call(input),
-                input: {
-                    type: "assistant",
-                },
-            },
-            GetWebpage: {
-                name: getWebpageTool.name,
-                description: getWebpageTool.description,
-                fn: (input: string) => getWebpageTool.call(input),
-                input: {
-                    type: "assistant",
-                },
-            },
-            Calculator: {
-                name: calculatorTool.name,
-                description: calculatorTool.description,
-                fn: (input: string) => calculatorTool.call(input),
-                input: {
-                    type: "assistant"
-                }
-            },
-            RetrieveMemory: {
-                name: "RetrieveMemory",
-                description: retrieveMemoryTool.description,
-                fn: (input: string) => retrieveMemoryTool.call(input),
-                input: {
-                    type: "assistant",
-                },
-            },
-            SaveMemory: {
-                name: "SaveMemory",
-                description: saveMemoryTool.description,
-                fn: (input: string) => saveMemoryTool.call(input),
-                input: {
-                    type: "assistant",
-                },
-            }
+            ...tools
         }
-        const tools = Object.values(this.actionMap)
+        const toolsPrompt = Object.values(this.actionMap)
             .map((o) => `- ${o.name}[${o.description}]`)
             .join("\n");
         const examplePrompt = this.examples.map((o) => `- ${o.input}\n${o.response}`).join("\n");
-        this.systemPrompt = this.systemPrompt.replace("{{tools}}", tools).replace("{{examples}}", examplePrompt);
+        this.systemPrompt = this.systemPrompt.replace("{{tools}}", toolsPrompt).replace("{{examples}}", examplePrompt);
         this.InternalDialogue = new ChatEngine("", undefined, flowResetText, languageConfig);
     };
    
