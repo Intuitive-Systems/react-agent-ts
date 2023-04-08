@@ -112,9 +112,6 @@ After running the stack, you can navigate to the OpenTelemetry UI at [`http://lo
 By leveraging OpenTelemetry and our docker-compose setup, you can debug your ReAct agents both quickly and easily, ensuring a seamless development experience.
 
 ## 📝 TODOs
-- [ ]: Set up tracing for debugging
-- [ ]: Re-assess Agent and ReactEngine abstraction to ensure fit
-- [ ]: fixup the ReactEngine system prompt such that tools are better formatted and have more information 
 - [ ]: flesh out the PluginTool such that it more dynamically deals with arbitrary plugins -- should probably be lifted into its own Engine / Agent abstraction (ex. PluginEnging or APIAgent)
 - [ ]: Build tracing tool which allows agent to introspect into traces and self-diagnose
 
