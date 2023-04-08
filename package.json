@@ -1,6 +1,6 @@
 {
   "name": "react-agent-ts",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "Conner Swann <conner@intuitivesystems.xyz>",
@@ -8,6 +8,7 @@
   "private": false,
   "scripts": {
     "build": "tsc",
+    "prepublishOnly": "yarn run build",
     "start": "npx ts-node --require ./src/tracing.ts ./src/server/index.ts"
   },
   "dependencies": {
