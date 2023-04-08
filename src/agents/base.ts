@@ -25,7 +25,7 @@ export class BaseAgent<T extends IBaseEngine> {
             return response;
         } catch (error) {
             console.error(`Error when adding message: ${error}`);
-            return null;
+            throw error;
         }
     }
     async reset() {

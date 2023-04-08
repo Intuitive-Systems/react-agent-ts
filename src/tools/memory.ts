@@ -31,7 +31,7 @@ export class RetrieveMemory extends BaseTool {
     this.bearerToken = bearerToken;
   }
 
-  async call(query: string, top_k: number = 3): Promise<any> {
+  async call(query: string, top_k: number = 3): Promise<string> {
     //const formattedQueries = queries.map(query => ({ query, top_k }));
     const formattedQuery = {
       query: query,
@@ -100,18 +100,18 @@ export class SaveMemory extends BaseTool {
     const payload = {
       documents: [document]
     }
-    console.log(`Saving document: ${JSON.stringify(document)}`)
+    //console.log(`Saving document: ${JSON.stringify(document)}`)
     if (!this.bearerToken) {
       console.error('Bearer Token is not defined');
     }
-    console.log(`Token: ${this.bearerToken}`);
+    // console.log(`Token: ${this.bearerToken}`);
     
     if (!this.apiUrl) {
       console.error('API URL is not defined');
     }
-    console.log(`API URL: ${this.apiUrl}`);
+    // console.log(`API URL: ${this.apiUrl}`);
     
-    console.log(`Payload: ${JSON.stringify(payload, null, 2)}`);
+    //console.log(`Payload: ${JSON.stringify(payload, null, 2)}`);
     
     try {
       const res = await axios.post(`${this.apiUrl}/upsert`, payload, {

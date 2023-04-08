@@ -124,7 +124,7 @@ export interface ChatMessage {
     content: string;
     name?: string;
 }
-export async function chatCompletion(messages: ChatMessage[], max_tokens: number = 1000, temperature: number = 0.7, model: string = "gpt-4") {
+export async function chatCompletion(messages: ChatMessage[], max_tokens: number = 1000, temperature: number = 0.7, model: string = "gpt-3.5-turbo"): Promise<string> {
     const span = tracer.startSpan('chatCompletion');
     const response = await retry(
         async () => {
