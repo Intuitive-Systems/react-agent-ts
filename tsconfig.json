@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
-        "target": "es2017",
-        "moduleResolution": "node",
+        "declaration": true,
         "outDir": "dist",
-    },
+        "rootDir": "src",
+        "lib": ["es2022", "dom"],
+    }
 }
