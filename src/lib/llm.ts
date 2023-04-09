@@ -3,6 +3,7 @@ import {Configuration, OpenAIApi} from 'openai';
 import {config} from "../config";
 import { inspect } from 'util';
 import opentelemetry from "@opentelemetry/api";
+import { ChatMessage } from '../interfaces';
 const tracer = opentelemetry.trace.getTracer(
     'react-agent-ts'
   );
@@ -119,11 +120,7 @@ export async function openaiCompletion(prompt: string, nTokens: number = 500, te
     return text!;
 }
 
-export interface ChatMessage {
-    role: "user" | "assistant" | "system";
-    content: string;
-    name?: string;
-}
+
 export async function chatCompletion(messages: ChatMessage[], max_tokens: number = 1000, temperature: number = 0.7, model: string = "gpt-4") {
     const span = tracer.startSpan('chatCompletion');
     const response = await retry(
