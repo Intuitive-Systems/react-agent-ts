@@ -7,7 +7,7 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import * as dotenv from 'dotenv';
 
-const otlpEndpoint = process.env.OTLP_ENDPOINT ?? 'http://localhost:9411';
+const otlpEndpoint = process.env.OTLP_ENDPOINT ?? 'http://localhost:4318';
 dotenv.config();
 
 // Optionally register instrumentation libraries

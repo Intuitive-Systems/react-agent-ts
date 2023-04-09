@@ -71,3 +71,5 @@ export const availableTools: Record<string, Tool> = {
         },
     }
 }
+
+export { BaseTool, SerpAPI, RetrieveMemory, SaveMemory, GetWebpage, PluginTool };

@@ -2,7 +2,8 @@
 // allows for messages to be added to the class
 // allows for messages to be removed from the class
 // allows for templating of messages
-import { ChatMessage, chatCompletion } from '../lib/llm';
+import { chatCompletion } from '../lib/llm';
+import { ChatMessage } from '../interfaces';
 import {config} from '../config';
 import { ChatEngine, IChatConfig, DefaultChatConfig, Interaction } from 'prompt-engine';
 
@@ -56,7 +57,7 @@ Rules:
             Finish: {
                 name: "Finish",
                 description:
-                    "Return a response to the user. This should be the last action you take. Finish[Your reply]",
+                    "Return a response to the user. This should be the last action you take. Finish[Your one line reply without formatting]",
                 fn: (input: string) => {
                     return input;
                 },
