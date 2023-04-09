@@ -57,7 +57,7 @@ Rules:
             Finish: {
                 name: "Finish",
                 description:
-                    "Return a response to the user. This should be the last action you take. Finish[Your reply]",
+                    "Return a response to the user. This should be the last action you take. Finish[Your one line reply without formatting]",
                 fn: (input: string) => {
                     return input;
                 },
